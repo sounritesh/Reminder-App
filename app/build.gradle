@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.curiositymeetsminds.doreminder"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -24,6 +24,8 @@ android {
     }
 
 }
+
+android.defaultConfig.vectorDrawables.useSupportLibrary = true
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
