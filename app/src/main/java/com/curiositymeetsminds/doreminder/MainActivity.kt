@@ -1,16 +1,9 @@
 package com.curiositymeetsminds.doreminder
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
+import android.content.ContentValues
 import android.os.Bundle
-import android.os.Debug
-import android.util.EventLogTags
 import android.util.Log
-import android.view.View
-import kotlinx.android.synthetic.main.activity_main.*
-import javax.net.ssl.HttpsURLConnection
+import androidx.appcompat.app.AppCompatActivity
 
 private const val TAG = "MainActivity"
 
@@ -20,13 +13,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+//        val values = ContentValues().apply {
+//            put(TasksContract.Columns.TASK_NAME, "Email RSR")
+//            put(TasksContract.Columns.TASK_TYPE, TaskType.EMAIL)
+//        }
+//
+//        val uri = contentResolver.insert(TasksContract.CONTENT_URI, values)
+//        Log.d(TAG, "testInsert: $uri")
         Log.d(TAG, "onCreate: starts")
-        val db = AppDatabase.getInstance(this).readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM ${TasksContract.TABLE_NAME}", null)
+        val cursor = contentResolver.query(TasksContract.CONTENT_URI, null, null, null, null)
 
         Log.d(TAG, "*****************************************************************************")
         cursor.use {
-            while (it.moveToNext()) {
+            while (it?.moveToNext()!!) {
                 with (it) {
                     val id = getLong(0)
                     val name = getString(1)
@@ -50,4 +49,9 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        })
     }
+
+//    private fun testInsert() {
+//
+//    }
+
 }
