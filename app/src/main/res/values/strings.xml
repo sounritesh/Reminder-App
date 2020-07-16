@@ -1,6 +1,11 @@
 <resources>
-    <string
-        name="app_name"
-        formatted="true"
-        >To do</string>
+    <string name="app_name" formatted="true">To do</string>
+
+    <string-array name="task_type">
+        <item>Email</item>
+        <item>Call</item>
+        <item>Message</item>
+        <item>Search</item>
+        <item>Other</item>
+    </string-array>
 </resources>

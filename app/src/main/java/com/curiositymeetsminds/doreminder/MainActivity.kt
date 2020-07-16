@@ -1,9 +1,10 @@
 package com.curiositymeetsminds.doreminder
 
-import android.content.ContentValues
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
 
@@ -37,6 +38,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
         Log.d(TAG, "*****************************************************************************")
+
+        fab.setOnClickListener {
+            val intent =  Intent(this, AddTask::class.java)
+            startActivity(intent)
+        }
 
 //        var number: String = "1111111111"
 //        var message: String = "How are you?"
