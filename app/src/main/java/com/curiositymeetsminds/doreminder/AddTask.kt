@@ -1,9 +1,11 @@
 package com.curiositymeetsminds.doreminder
 
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -37,6 +39,22 @@ class AddTask : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_add, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.save) {
+            val values = ContentValues().apply {
+                put(TasksContract.Columns.TASK_NAME, addTaskName.text.toString())
+                put(TasksContract.Columns.TASK_DESCRIPTION, addTaskDescription.text.toString())
+                put(TasksContract.Columns.TASK_TYPE, taskType.text.toString())
+            }
+            val uri = contentResolver.insert(TasksContract.CONTENT_URI, values)
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        } else {
+            super.onOptionsItemSelected(item)
+        }
         return true
     }
 
