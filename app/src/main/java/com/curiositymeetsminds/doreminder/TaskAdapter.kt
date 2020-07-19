@@ -27,5 +27,10 @@ class TaskAdapter(private val taskList: ArrayList<TaskData>): RecyclerView.Adapt
         holder.taskId.text = task.taskId.toString()
         holder.taskName.text = task.taskName
         holder.taskDescription.text = task.taskDescription
+
+        //To know which item is being swiped in the recyclerView
+        holder.itemView.tag = task.taskId
     }
+
+
 }

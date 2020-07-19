@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -15,6 +17,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(toolbar)
+        title = "Your Tasks"
 
         var taskList = ArrayList<TaskData>()
 //        val values = ContentValues().apply {
@@ -41,6 +46,27 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = TaskAdapter(taskList)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+//      Delete functionality
+        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback (0, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.adapterPosition
+                taskList.removeAt(pos)
+                contentResolver.delete(TasksContract.buildUriFromId(viewHolder.itemView.tag.toString().toLong()), null, null)
+                val adapter = recyclerView.adapter
+                adapter?.notifyItemRemoved(pos)
+            }
+        }
+        ItemTouchHelper(itemTouchCallback).attachToRecyclerView(recyclerView)
+
 
 //        Log.d(TAG, "*****************************************************************************")
 //        cursor.use {

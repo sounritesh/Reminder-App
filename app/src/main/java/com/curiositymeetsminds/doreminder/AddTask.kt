@@ -23,6 +23,7 @@ class AddTask : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setContentView(R.layout.activity_add)
 
         setSupportActionBar(toolbar)
+        title = "Adding Task"
         toolbar.setNavigationIcon(R.drawable.ic_keyboard_backspace_black_24dp)
         toolbar.setNavigationOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
