@@ -1,8 +1,11 @@
 package com.curiositymeetsminds.doreminder
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,7 +15,7 @@ import kotlinx.android.synthetic.main.content_main.*
 
 private const val TAG = "MainActivity"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ListClickListener.OnRecyclerClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = TaskAdapter(taskList)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.addOnItemTouchListener(ListClickListener(this, recyclerView, this))
 
 //      Delete functionality
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback (0, ItemTouchHelper.LEFT) {
@@ -64,6 +68,8 @@ class MainActivity : AppCompatActivity() {
                 val adapter = recyclerView.adapter
                 adapter?.notifyItemRemoved(pos)
             }
+
+
         }
         ItemTouchHelper(itemTouchCallback).attachToRecyclerView(recyclerView)
 
@@ -100,7 +106,25 @@ class MainActivity : AppCompatActivity() {
 //        })
     }
 
-//    private fun testInsert() {
+    override fun onItemClick(view: View, position: Int) {
+        Log.d(TAG, "onItemClick: tap detected at $position")
+//        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel: 9910738266"))
+//        startActivity(intent)
+        val selection = "${TasksContract.Columns.TASK_ID}=?"
+        val selectionArgs = arrayOf(view.tag.toString())
+        val cursor = contentResolver.query(TasksContract.CONTENT_URI, null, selection, selectionArgs, null)
+        cursor.use {
+            if (it!!.moveToFirst()) {
+                with (it) {
+                    val type = getString(3)
+                    Log.d(TAG, "onItemClick: Task type is $type")
+                }
+            }
+        }
+        Toast.makeText(this, "The id is ${view.tag}", Toast.LENGTH_SHORT).show()
+    }
+
+    //    private fun testInsert() {
 //
 //    }
 

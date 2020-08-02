@@ -1,5 +1,7 @@
 package com.curiositymeetsminds.doreminder
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +12,8 @@ class TaskViewHolder (view: View): RecyclerView.ViewHolder (view) {
     val taskId = view.findViewById<TextView>(R.id.taskId)
     val taskName = view.findViewById<TextView>(R.id.taskName)
     val taskDescription = view.findViewById<TextView>(R.id.taskDescription)
+
+
 }
 
 class TaskAdapter(private val taskList: ArrayList<TaskData>): RecyclerView.Adapter<TaskViewHolder>() {
@@ -30,7 +34,6 @@ class TaskAdapter(private val taskList: ArrayList<TaskData>): RecyclerView.Adapt
 
         //To know which item is being swiped in the recyclerView
         holder.itemView.tag = task.taskId
+
     }
-
-
 }
