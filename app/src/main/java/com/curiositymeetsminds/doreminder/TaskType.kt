@@ -9,4 +9,5 @@ object TaskType {
     const val CALL = "Call"
     const val SEARCH = "Search"
     const val MESSAGE = "Message"
+    const val OTHER = "Other"
 }

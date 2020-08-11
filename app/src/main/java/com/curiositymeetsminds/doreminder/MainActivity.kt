@@ -1,8 +1,10 @@
 package com.curiositymeetsminds.doreminder
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.lang.IllegalArgumentException
 
 private const val TAG = "MainActivity"
 
@@ -33,7 +36,7 @@ class MainActivity : AppCompatActivity(), ListClickListener.OnRecyclerClickListe
 //        val uri = contentResolver.insert(TasksContract.CONTENT_URI, values)
 //        Log.d(TAG, "testInsert: $uri")
         Log.d(TAG, "onCreate: starts")
-        val cursor = contentResolver.query(TasksContract.CONTENT_URI, null, null, null, null)
+        val cursor = contentResolver.query(TasksContract.CONTENT_URI, null, null, null, "${TasksContract.Columns.TASK_ID} DESC")
 
         cursor.use {
             while (it?.moveToNext()!!) {
@@ -108,24 +111,65 @@ class MainActivity : AppCompatActivity(), ListClickListener.OnRecyclerClickListe
 
     override fun onItemClick(view: View, position: Int) {
         Log.d(TAG, "onItemClick: tap detected at $position")
+
 //        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel: 9910738266"))
 //        startActivity(intent)
-        val selection = "${TasksContract.Columns.TASK_ID}=?"
-        val selectionArgs = arrayOf(view.tag.toString())
-        val cursor = contentResolver.query(TasksContract.CONTENT_URI, null, selection, selectionArgs, null)
+        var type: String = TaskType.OTHER
+        val cursor = contentResolver.query(TasksContract.buildUriFromId(view.tag.toString().toLong()), null, null, null, null)
         cursor.use {
             if (it!!.moveToFirst()) {
                 with (it) {
-                    val type = getString(3)
+                    type = getString(3)
                     Log.d(TAG, "onItemClick: Task type is $type")
                 }
             }
         }
         Toast.makeText(this, "The id is ${view.tag}", Toast.LENGTH_SHORT).show()
-    }
 
-    //    private fun testInsert() {
-//
-//    }
+        val intent = when (type) {
+            TaskType.CALL -> {
+                Intent(Intent.ACTION_DIAL)
+            }
+            TaskType.SEARCH -> {
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.co.in/"))
+            }
+            TaskType.MESSAGE -> {
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, "Hello!")
+                }
+            }
+            TaskType.EMAIL -> {
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/html"
+                    putExtra(Intent.EXTRA_EMAIL, "sounritesh@gmail.com")
+                    putExtra(Intent.EXTRA_SUBJECT, "Important mail")
+                    putExtra(Intent.EXTRA_TEXT, "Regards \n Ritesh Soun")
+                }
+            }
+            TaskType.OTHER -> {
+                Intent()
+            }
+            else -> throw IllegalArgumentException ("Unknown intent selected")
+        }
+
+        Log.d(TAG, "$intent")
+
+//        val testIntent = Intent(Intent.ACTION_SEND).apply {
+//            type = "text/html"
+//            putExtra(Intent.EXTRA_EMAIL, "sounritesh@gmail.com")
+//            putExtra(Intent.EXTRA_SUBJECT, "Important mail")
+//            putExtra(Intent.EXTRA_TEXT, "Regards \n Ritesh Soun")
+//        }
+//        if (testIntent.resolveActivity(packageManager) != null) {
+//            startActivity(testIntent)
+//        }
+
+        val chooser = Intent.createChooser(intent, "Choose an app to execute action.")
+        if (chooser.resolveActivity(packageManager) != null) {
+            Log.d(TAG, "starting intent")
+            startActivity(chooser)
+        }
+    }
 
 }
