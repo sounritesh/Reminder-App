@@ -1,10 +1,8 @@
 package com.curiositymeetsminds.doreminder
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -14,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import java.lang.IllegalArgumentException
 
 private const val TAG = "MainActivity"
 
@@ -109,6 +106,41 @@ class MainActivity : AppCompatActivity(), ListClickListener.OnRecyclerClickListe
 //        })
     }
 
+    private fun sendToEmail () {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "message/rfc822"
+            putExtra(Intent.EXTRA_EMAIL, "sounritesh@gmail.com")
+        }
+
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+
+    private fun sendToMessage () {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, "Hi")
+        }
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+
+    private fun sendToSearch () {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+
+    private fun sendToDial () {
+        val intent = Intent(Intent.ACTION_DIAL)
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+
     override fun onItemClick(view: View, position: Int) {
         Log.d(TAG, "onItemClick: tap detected at $position")
 
@@ -126,35 +158,28 @@ class MainActivity : AppCompatActivity(), ListClickListener.OnRecyclerClickListe
         }
         Toast.makeText(this, "The id is ${view.tag}", Toast.LENGTH_SHORT).show()
 
-        val intent = when (type) {
+        when (type) {
             TaskType.CALL -> {
-                Intent(Intent.ACTION_DIAL)
+                sendToDial()
             }
             TaskType.SEARCH -> {
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.co.in/"))
+                sendToSearch()
             }
             TaskType.MESSAGE -> {
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, "Hello!")
-                }
+                sendToMessage()
             }
             TaskType.EMAIL -> {
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "text/html"
-                    putExtra(Intent.EXTRA_EMAIL, "sounritesh@gmail.com")
-                    putExtra(Intent.EXTRA_SUBJECT, "Important mail")
-                    putExtra(Intent.EXTRA_TEXT, "Regards \n Ritesh Soun")
-                }
+                sendToEmail()
             }
             TaskType.OTHER -> {
-                Intent()
+                Log.d(TAG, ".onItemClick")
             }
             else -> throw IllegalArgumentException ("Unknown intent selected")
         }
 
         Log.d(TAG, "$intent")
 
+// ====================================================================================
 //        val testIntent = Intent(Intent.ACTION_SEND).apply {
 //            type = "text/html"
 //            putExtra(Intent.EXTRA_EMAIL, "sounritesh@gmail.com")
@@ -164,12 +189,13 @@ class MainActivity : AppCompatActivity(), ListClickListener.OnRecyclerClickListe
 //        if (testIntent.resolveActivity(packageManager) != null) {
 //            startActivity(testIntent)
 //        }
+//=====================================================================================
 
-        val chooser = Intent.createChooser(intent, "Choose an app to execute action.")
-        if (chooser.resolveActivity(packageManager) != null) {
-            Log.d(TAG, "starting intent")
-            startActivity(chooser)
-        }
+//        val chooser = Intent.createChooser(intent, "Choose an app to execute action.")
+//        if (chooser.resolveActivity(packageManager) != null) {
+//            Log.d(TAG, "starting intent")
+//            startActivity(chooser)
+//        }
     }
 
 }

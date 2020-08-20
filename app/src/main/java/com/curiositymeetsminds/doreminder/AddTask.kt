@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_add.*
 
@@ -36,6 +37,16 @@ class AddTask : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             taskTypeSpinner.adapter = it
         }
         taskTypeSpinner.onItemSelectedListener = this
+
+        detailSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                Toast.makeText(this, "switch turned on", Toast.LENGTH_SHORT).show()
+                val callDialogBox = CallDialogBox()
+                callDialogBox.show(supportFragmentManager, "CallDialogBox")
+            } else {
+                Toast.makeText(this, "switch turned off", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

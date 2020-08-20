@@ -11,6 +11,7 @@ private const val DATABASE_VERSION = 1
 private const val DATABASE_NAME = "DoReminder.db"
 
 internal class AppDatabase private constructor(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
+
     override fun onCreate(db: SQLiteDatabase) {
         Log.d(TAG, "onCreate: initialising database")
         val createTableStatement = """CREATE TABLE ${TasksContract.TABLE_NAME} 
