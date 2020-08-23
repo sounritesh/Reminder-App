@@ -8,7 +8,6 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
 import android.util.Log
-import java.lang.IllegalArgumentException
 
 private const val TAG = "AppProvider"
 
@@ -16,6 +15,9 @@ const val CONTENT_AUTHORITY = "com.curiositymeetsminds.doreminder.provider"
 
 private const val TASKS = 100
 private const val TASK_ID = 101
+
+private const val DETAILS = 200
+private const val DETAILS_ID = 201
 
 val CONTENT_AUTHORITY_URI: Uri = Uri.parse("content://$CONTENT_AUTHORITY")
 
@@ -29,6 +31,8 @@ class AppProvider: ContentProvider() {
 
         matcher.addURI(CONTENT_AUTHORITY, TasksContract.TABLE_NAME, TASKS)
         matcher.addURI(CONTENT_AUTHORITY, "${TasksContract.TABLE_NAME}/#", TASK_ID)
+        matcher.addURI(CONTENT_AUTHORITY, DetailsContract.TABLE_NAME, DETAILS)
+        matcher.addURI(CONTENT_AUTHORITY, "${DetailsContract.TABLE_NAME}/#", DETAILS_ID)
 
         return matcher
     }
@@ -48,6 +52,10 @@ class AppProvider: ContentProvider() {
 
             TASK_ID -> TasksContract.CONTENT_ITEM_TYPE
 
+            DETAILS -> DetailsContract.CONTENT_TYPE
+
+            DETAILS_ID -> DetailsContract.CONTENT_ITEM_TYPE
+
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
     }
@@ -66,6 +74,16 @@ class AppProvider: ContentProvider() {
                 recordId = db.insert(TasksContract.TABLE_NAME, null, values)
                 if (recordId != -1L) {
                     returnUri = TasksContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Error inserting record")
+                }
+            }
+
+            DETAILS -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                recordId = db.insert(DetailsContract.TABLE_NAME, null, values)
+                if (recordId != -1L) {
+                    returnUri = DetailsContract.buildUriFromId(recordId)
                 } else {
                     throw SQLException("Error inserting record")
                 }
@@ -98,6 +116,15 @@ class AppProvider: ContentProvider() {
                 val taskId = TasksContract.getId(uri)
                 queryBuilder.appendWhere("${TasksContract.Columns.TASK_ID} = ")
                 queryBuilder.appendWhereEscapeString("$taskId")
+            }
+
+            DETAILS -> queryBuilder.tables = DetailsContract.TABLE_NAME
+
+            DETAILS_ID -> {
+                queryBuilder.tables = DetailsContract.TABLE_NAME
+                val detailId = DetailsContract.getId(uri)
+                queryBuilder.appendWhere("${DetailsContract.Columns.DETAIL_ID} = ")
+                queryBuilder.appendWhereEscapeString("$detailId")
             }
 
             else -> throw IllegalArgumentException("Unknown URI: $uri")
@@ -139,6 +166,21 @@ class AppProvider: ContentProvider() {
                 rowsAffected = db.update(TasksContract.TABLE_NAME, values, selectionCriteria, selectionArgs)
             }
 
+            DETAILS -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                rowsAffected = db.update(TasksContract.TABLE_NAME, values, selection, selectionArgs)
+            }
+
+            DETAILS_ID -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                val detailId = DetailsContract.getId(uri)
+                selectionCriteria = "${DetailsContract.Columns.DETAIL_ID} = $detailId"
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += "AND $selection"
+                }
+                rowsAffected = db.update(DetailsContract.TABLE_NAME, values, selectionCriteria, selectionArgs)
+            }
+
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
 
@@ -168,6 +210,21 @@ class AppProvider: ContentProvider() {
                     selectionCriteria += " AND $selection"
                 }
                 rowsAffected = db.delete(TasksContract.TABLE_NAME, selectionCriteria, selectionArgs)
+            }
+
+            DETAILS -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                rowsAffected = db.delete(DetailsContract.TABLE_NAME, selection, selectionArgs)
+            }
+
+            DETAILS_ID -> {
+                val db = AppDatabase.getInstance(context!!).writableDatabase
+                val detailId = DetailsContract.getId(uri)
+                selectionCriteria = "${DetailsContract.Columns.DETAIL_ID} = $detailId"
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += "AND $selection"
+                }
+                rowsAffected = db.delete(DetailsContract.TABLE_NAME, selectionCriteria, selectionArgs)
             }
 
             else -> throw IllegalArgumentException("Unknown URI: $uri")

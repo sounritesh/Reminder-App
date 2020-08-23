@@ -12,7 +12,6 @@
         <item name="colorOnSurface">#000000</item>
         <item name="colorOnBackground">#000000</item>
         <item name="android:textColorHint">#B8B8B8</item>
-
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorOnSecondary">#FFFFFF</item>
     </style>

@@ -1,5 +1,4 @@
 package com.curiositymeetsminds.doreminder
-
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
@@ -11,13 +10,17 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.activity_add.*
 
 private const val TAG = "AddTask"
 
-class AddTask : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class AddTask : AppCompatActivity(),
+    AdapterView.OnItemSelectedListener,
+    CallDialogBox.ClickListener{
 
     var spinnerText = ""
+    private val callDialogBox = CallDialogBox()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,12 +44,21 @@ class AddTask : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         detailSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 Toast.makeText(this, "switch turned on", Toast.LENGTH_SHORT).show()
-                val callDialogBox = CallDialogBox()
+                buttonView.toggle()
                 callDialogBox.show(supportFragmentManager, "CallDialogBox")
             } else {
                 Toast.makeText(this, "switch turned off", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    override fun onCallPositiveClickListener(dialog: DialogFragment) {
+        Log.d(TAG, "OKAY clicked")
+        detailSwitch.isChecked = true
+    }
+
+    override fun onCallNegativeClickListener(dialog: DialogFragment) {
+        Log.d(TAG, "CANCEL clicked")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

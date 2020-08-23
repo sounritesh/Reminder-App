@@ -14,15 +14,25 @@ internal class AppDatabase private constructor(context: Context): SQLiteOpenHelp
 
     override fun onCreate(db: SQLiteDatabase) {
         Log.d(TAG, "onCreate: initialising database")
-        val createTableStatement = """CREATE TABLE ${TasksContract.TABLE_NAME} 
+        val createTableTasks = """CREATE TABLE ${TasksContract.TABLE_NAME} 
             (${TasksContract.Columns.TASK_ID} INTEGER PRIMARY KEY NOT NULL,
             ${TasksContract.Columns.TASK_NAME} TEXT NOT NULL,
             ${TasksContract.Columns.TASK_DESCRIPTION} TEXT,
             ${TasksContract.Columns.TASK_TYPE});
         """.replaceIndent(" ")
-        Log.d(TAG, createTableStatement)
+        Log.d(TAG, createTableTasks)
+        db.execSQL(createTableTasks)
 
-        db.execSQL(createTableStatement)
+        val createTableDetails = """CREATE TABLE ${DetailsContract.TABLE_NAME}
+            (${DetailsContract.Columns.DETAIL_ID} INTEGER PRIMARY KEY NOT NULL,
+            ${DetailsContract.Columns.DETAIL_MOBILE_NUMBER} TEXT,
+            ${DetailsContract.Columns.DETAIL_EMAIL_ID} TEXT,
+            ${DetailsContract.Columns.DETAIL_SUBJECT} TEXT,
+            ${DetailsContract.Columns.DETAIL_BODY} TEXT,
+            ${DetailsContract.Columns.DETAIL_SEARCH_QUERY} TEXT);
+        """.replaceIndent(" ")
+        Log.d(TAG, createTableDetails)
+        db.execSQL(createTableDetails)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
